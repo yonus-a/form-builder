@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.svc-creator * {
+  font-weight: normal !important;
+}
+
+.svc-creator__non-commercial-text {
+  display: none;
+}

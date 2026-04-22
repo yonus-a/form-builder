@@ -1,78 +1,33 @@
 <script setup lang="ts">
-import { SurveyCreatorModel, editorLocalization } from "survey-creator-core";
-import { DefaultDark, DefaultLight } from "survey-creator-core/themes";
+import useStandardChanger from "../composables/useStandardChanger";
+import useSurveyCreator from "../composables/useSurveyCreator";
 import { SurveyCreatorComponent } from "survey-creator-vue";
-import type { ICreatorOptions } from "survey-creator-core";
+import { Locales, Themes } from "../types/types";
 import JsonGenerator from "./JsonGenerator.vue";
 import IconPicker from "./IconPicker.vue";
 import "survey-creator-core/i18n/persian";
+import Standard from "./Standard.vue";
 import "../utils/serilizers";
-
-import { createApp, nextTick, onMounted, type PropType } from "vue";
 
 const emit = defineEmits(["update"]);
 
-const props = defineProps({
-  locale: {
-    default: "fa",
-    type: String as PropType<"fa" | "en">,
-  },
-  theme: {
-    default: "dark",
-    type: String as PropType<"dark" | "light">,
-  },
-});
+useStandardChanger();
 
-const creatorOptions: ICreatorOptions = {
-  showCreatorThemeSettings: false,
-  autoSaveEnabled: true,
-  collapseOnDrag: true,
-};
+const props = defineProps<{
+  locale: Locales;
+  theme: Themes;
+}>();
 
-editorLocalization.currentLocale = props.locale;
-const creator = new SurveyCreatorModel(creatorOptions);
-creator.toolbox.showSubitems = false;
-
-creator.applyCreatorTheme(props.theme === "dark" ? DefaultDark : DefaultLight);
+const creator = useSurveyCreator(props);
 
 creator.saveSurveyFunc = () => {
   emit("update", creator.JSON);
 };
-
-onMounted(() => {
-  const observer = new MutationObserver(async () => {
-    // Icon Picker
-    const IconPickerContainer = document.querySelector(
-      ".svc-logo-image input.svc-choose-file-input",
-    );
-
-    if (
-      IconPickerContainer &&
-      !IconPickerContainer.classList.contains("icon-picker-rendered")
-    ) {
-      IconPickerContainer.classList.add("icon-picker-rendered");
-      createApp(IconPicker, {
-        defaultValue: creator.JSON.icon,
-        onSelect: (icon: string) => {
-          creator.survey.icon = icon;
-        },
-      }).mount(".svc-logo-image");
-    }
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
-});
-
-const handleSetJson = async (json: string) => {
-  await nextTick();
-  creator.JSON = JSON.parse(json);
-};
 </script>
 
 <template>
-  <JsonGenerator :onUpdate="handleSetJson" />
+  <IconPicker />
+  <JsonGenerator />
+  <Standard :locale="locale" />
   <SurveyCreatorComponent :model="creator" ref="creatorEl" />
 </template>

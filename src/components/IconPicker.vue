@@ -1,21 +1,29 @@
-<script setup>
-import { useClickOutside } from "../composables/useClickOutside";
-import { ref, computed, shallowRef, useTemplateRef } from "vue";
+<script setup lang="ts">
+import useSurveyCreator from "../composables/useSurveyCreator";
+import { ref, computed, shallowRef } from "vue";
 import * as LucideIcons from "lucide-vue-next";
-
-const props = defineProps({
-  defaultValue: String,
-});
-
-const emit = defineEmits(["select"]);
+import Modal from "./Modal.vue";
 
 const search = ref("");
 const isOpen = ref(false);
-const selectedIconName = ref(props.defaultValue);
-const containerRef = useTemplateRef("icon-picker-container");
+
+const creator = useSurveyCreator();
+
+creator.survey.onAfterRenderHeader.add((_, options) => {
+  const logoPicker: HTMLElement | null = options.htmlElement?.children?.[1];
+  if (logoPicker) {
+    // remove file input
+    const fileInput = logoPicker.firstChild;
+    if (fileInput) logoPicker.removeChild(fileInput);
+
+    logoPicker.addEventListener("click", (e) => {
+      e.preventDefault();
+      isOpen.value = !isOpen.value;
+    });
+  }
+});
 
 const ALL_ICONS = shallowRef(LucideIcons);
-
 const filteredIcons = computed(() => {
   const query = search.value.toLowerCase();
   return Object.entries(ALL_ICONS.value)
@@ -26,145 +34,38 @@ const filteredIcons = computed(() => {
     .slice(0, 80);
 });
 
-const togglePicker = () => (isOpen.value = !isOpen.value);
-
-const selectIcon = (name) => {
-  selectedIconName.value = name;
+const selectIcon = (name: string) => {
+  creator.survey.icon = name;
   isOpen.value = false;
-  emit("select", name);
 };
-
-useClickOutside(containerRef, () => (isOpen.value = false));
 </script>
 
 <template>
-  <div class="icon-picker" ref="icon-picker-container" dir="rtl">
-    <button
-      @click="togglePicker"
-      class="trigger-btn"
-      :class="{ 'is-active': selectedIconName }"
-      type="button"
+  <Modal v-model="isOpen">
+    <div
+      v-if="isOpen"
+      class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90%] md:w-[40%] lg:w-[30%] p-4 rounded-[20px] bg-[#161519] border border-white/10 backdrop-blur-xl shadow-2xl"
+      dir="rtl"
     >
-      <component
-        :is="ALL_ICONS[selectedIconName] || ALL_ICONS.Image"
-        class="w-6 h-6"
+      <input
+        v-model.trim="search"
+        class="w-full bg-[#27262b] border border-[#1a181e] rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-[#2dd4bf]/30 transition-all resize-y"
+        placeholder="جستجوی آیکون..."
+        autofocus
       />
-    </button>
-    <Transition name="pop">
-      <div v-if="isOpen" class="picker-modal">
-        <div class="picker-header">
-          <input
-            v-model.trim="search"
-            class="search-input"
-            placeholder="جستجوی آیکون..."
-            autofocus
-          />
-        </div>
-
-        <div class="icon-grid custom-scrollbar">
-          <button
-            v-for="[name, IconComp] in filteredIcons"
-            :key="name"
-            @click="selectIcon(name)"
-            :class="['icon-item', { 'is-selected': selectedIconName === name }]"
-            :title="name"
-          >
-            <component :is="IconComp" />
-          </button>
-        </div>
+      <div
+        class="grid grid-cols-8 gap-y-3 max-h-[40vh] overflow-y-scroll mt-6 justify-items-center"
+      >
+        <button
+          v-for="[name, IconComp] in filteredIcons"
+          @click="selectIcon(name)"
+          class="rounded-xl bg-[#27262b] p-4 text-white hover:bg-[#26bba8] active:scale-[0.98] transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+          :title="name"
+          :key="name"
+        >
+          <component :is="IconComp as Object" />
+        </button>
       </div>
-    </Transition>
-  </div>
+    </div>
+  </Modal>
 </template>
-
-<style scoped>
-.icon-picker {
-  --primary: #2dd4bf;
-  --bg-dark: #1c1b20;
-  --border: rgba(255, 255, 255, 0.1);
-  display: inline-block;
-  position: relative;
-}
-
-.trigger-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: transparent;
-  color: #94a3b8;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-}
-
-.trigger-btn.is-active {
-  color: var(--primary);
-  border-color: var(--primary);
-}
-
-.picker-modal {
-  position: fixed;
-  width: 320px;
-  background: rgba(28, 27, 32, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 16px;
-  z-index: 9999;
-  box-shadow: 0 0 0 10000px rgba(0, 0, 0, 0.5);
-}
-
-.search-input {
-  width: 100%;
-  padding: 10px 15px;
-  background: #0f1115;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  color: #e2e8f0;
-  font-size: 14px;
-  outline: none;
-  box-sizing: border-box;
-  margin-bottom: 1em;
-}
-
-.search-input:focus {
-  border-color: rgba(45, 212, 191, 0.4);
-}
-
-.icon-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-  max-height: 280px;
-  overflow-y: auto;
-  padding: 8px 4px;
-}
-
-.icon-item {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-}
-
-.icon-item:hover,
-.icon-item.is-selected {
-  background: rgba(45, 212, 191, 0.15);
-  color: var(--primary);
-}
-
-.pop-enter-active,
-.pop-leave-active {
-  transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-}
-.pop-enter-from,
-.pop-leave-to {
-  opacity: 0;
-  transform: translate(-50%, -40%) scale(0.9);
-}
-</style>

@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { DefaultDark, DefaultLight } from "survey-creator-core/themes";
 import useStandardChanger from "../composables/useStandardChanger";
 import useSurveyCreator from "../composables/useSurveyCreator";
+import { type SurveyCreatorModel } from "survey-creator-core";
 import { SurveyCreatorComponent } from "survey-creator-vue";
+import type { Observation } from "../types/lonic";
 import { Locales, Themes } from "../types/types";
 import JsonGenerator from "./JsonGenerator.vue";
 import IconPicker from "./IconPicker.vue";
@@ -14,11 +17,18 @@ const emit = defineEmits(["update"]);
 useStandardChanger();
 
 const props = defineProps<{
-  locale: Locales;
-  theme: Themes;
+  onGenerateJsonBtnClick: (prompt: string) => SurveyCreatorModel["JSON"];
+  onStandardSearch?: (text: string) => void;
+  standards?: Observation[];
+  locale: string | Locales;
+  theme: string | Themes;
 }>();
 
-const creator = useSurveyCreator(props);
+const creator = useSurveyCreator();
+
+// apply theme and locale
+creator.applyCreatorTheme(props.theme === "dark" ? DefaultDark : DefaultLight);
+creator.locale = props.locale;
 
 creator.saveSurveyFunc = () => {
   emit("update", creator.JSON);
@@ -27,7 +37,12 @@ creator.saveSurveyFunc = () => {
 
 <template>
   <IconPicker />
-  <JsonGenerator />
-  <Standard :locale="locale" />
-  <SurveyCreatorComponent :model="creator" ref="creatorEl" />
+  <JsonGenerator @generateBtnClick="props.onGenerateJsonBtnClick" />
+  <Standard
+    v-if="standards && onStandardSearch"
+    :onStandardSearch
+    :locale="locale"
+    :standards
+  />
+  <SurveyCreatorComponent :model="creator" />
 </template>

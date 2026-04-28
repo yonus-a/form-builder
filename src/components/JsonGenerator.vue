@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import useSurveyCreator from "../composables/useSurveyCreator";
-import { JsonPrefix } from "../utils/prefixPrompts";
+import type { SurveyCreatorModel } from "survey-creator-core";
 import { ref, useTemplateRef } from "vue";
 import { Action } from "survey-core";
 import Modal from "./Modal.vue";
+
+const props = defineProps<{
+  onGenerateBtnClick: (prompt: string) => SurveyCreatorModel["JSON"];
+}>();
 
 const textareaRef = useTemplateRef("chatbox");
 const isLoading = ref(false);
@@ -31,22 +35,8 @@ const handleClick = async () => {
 
   try {
     isLoading.value = true;
-    const res = await fetch("http://10.16.0.110:11434/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "gpt-oss:120b",
-        prompt: JSON.stringify([
-          ...JsonPrefix,
-          { role: "user", text: prompt.value },
-        ]),
-        stream: false,
-      }),
-    });
-
-    const data = await res.json();
-    creator.JSON = JSON.parse(data.response);
-    console.log(data.response);
+    const schema = await props.onGenerateBtnClick(prompt.value);
+    creator.JSON = schema;
   } catch (error) {
   } finally {
     isLoading.value = false;

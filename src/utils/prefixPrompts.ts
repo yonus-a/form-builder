@@ -75,7 +75,7 @@ EXPRESSION RULES (SurveyJS):
 Your output is directly rendered in a UI. DO NOT break format.
 `;
 
-export const JsonPrefix = [
+export const SurveySchemaPrompt = [
   {
     content:
       "We are developing a SurveyJS JSON schema. I will ask questions, and you will answer them and provide the full version of JSON in each response.You should give all answers only in this format: [COMMENT]your comment[/COMMENT] [JSON]Generated valid SurveyJS JSON[/JSON].",

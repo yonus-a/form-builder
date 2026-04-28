@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import useSurveyCreator from "../composables/useSurveyCreator";
 import type { Observation } from "../types/lonic";
-import { onMounted, ref, type Ref } from "vue";
 import { Locales } from "../types/types";
 import { Action } from "survey-core";
 import Modal from "./Modal.vue";
+import { ref, watch } from "vue";
 
-defineProps<{
-  locale: Locales;
+const props = defineProps<{
+  onStandardSearch: (text: string) => void;
+  locale: string | Locales;
+  standards: Observation[];
 }>();
 
-const items: Ref<Observation[]> = ref([]);
 const isLoading = ref(false);
 const isOpen = ref(false);
 const search = ref("");
@@ -25,25 +26,15 @@ const standardAction = new Action({
   },
 });
 
+let timeout = null;
+watch(search, () => {
+  clearTimeout(timeout!);
+  timeout = setTimeout(() => {
+    props.onStandardSearch(search.value);
+  }, 800);
+});
+
 creator.toolbar.actions.push(standardAction);
-
-const fetchStandards = async () => {
-  isLoading.value = true;
-
-  try {
-    const result = await fetch(
-      "http://localhost:3000/schemas?_page=1&_per_page=10",
-    );
-
-    const response = await result.json();
-
-    items.value = response.data;
-  } catch (error) {
-    console.log(error);
-  } finally {
-    isLoading.value = false;
-  }
-};
 
 const handleSelect = (item: Observation) => {
   if (item.formSchemaElements) {
@@ -56,10 +47,6 @@ const handleSelect = (item: Observation) => {
     isOpen.value = false;
   }
 };
-
-onMounted(() => {
-  fetchStandards();
-});
 </script>
 
 <template>
@@ -83,7 +70,7 @@ onMounted(() => {
       </div>
 
       <ul class="w-full h-[40vh] grid gap-3 mt-6 overflow-y-scroll">
-        <li v-for="item in items" :key="item.code">
+        <li v-for="item in standards" :key="item.code">
           <button
             class="rounded-xl w-full bg-[#27262b] p-4 text-white hover:bg-[#26bba8] active:scale-[0.98] transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             @click="() => handleSelect(item)"

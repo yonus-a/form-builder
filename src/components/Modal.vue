@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <Teleport to="body">
+  <div>
     <Transition name="fade">
       <div
         v-if="show"
@@ -19,7 +19,7 @@ defineProps<{
     <Transition name="pop" @after-enter="onAfterEnter">
       <slot> </slot>
     </Transition>
-  </Teleport>
+  </div>
 </template>
 
 <style scoped>

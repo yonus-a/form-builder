@@ -20,6 +20,7 @@ export {
   DefaultLightPanelless,
 } from "survey-core/themes";
 export { SurveyComponent } from "survey-vue3-ui";
+export type * from "./types/lonic";
 export * from "survey-core";
 
 export { FormBuilder, SurveySchemaPrompt };

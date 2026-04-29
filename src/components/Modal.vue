@@ -8,17 +8,19 @@ defineProps<{
 
 <template>
   <div>
-    <Transition name="fade">
-      <div
-        v-if="show"
-        class="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm transition-opacity"
-        @click="show = false"
-      ></div>
-    </Transition>
+    <Teleport to="body">
+      <Transition name="fade">
+        <div
+          v-if="show"
+          class="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm transition-opacity"
+          @click="show = false"
+        ></div>
+      </Transition>
 
-    <Transition name="pop" @after-enter="onAfterEnter">
-      <slot> </slot>
-    </Transition>
+      <Transition name="pop" @after-enter="onAfterEnter">
+        <slot> </slot>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useSurveyCreator from "../composables/useSurveyCreator";
-import { ref, computed, shallowRef } from "vue";
+import { ref, computed, shallowRef, type Ref } from "vue";
 import * as LucideIcons from "lucide-vue-next";
 import Modal from "./Modal.vue";
 
@@ -24,7 +24,7 @@ creator.survey.onAfterRenderHeader.add((_, options) => {
 });
 
 const ALL_ICONS = shallowRef(LucideIcons);
-const filteredIcons = computed(() => {
+const filteredIcons: Ref<[string, object][]> = computed(() => {
   const query = search.value.toLowerCase();
   return Object.entries(ALL_ICONS.value)
     .filter(
@@ -42,30 +42,63 @@ const selectIcon = (name: string) => {
 
 <template>
   <Modal v-model="isOpen">
-    <div
-      v-if="isOpen"
-      class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90%] md:w-[40%] lg:w-[30%] p-4 rounded-[20px] bg-[#161519] border border-white/10 backdrop-blur-xl shadow-2xl"
-      dir="rtl"
-    >
+    <div v-if="isOpen" class="modal-container" dir="rtl">
       <input
         v-model.trim="search"
-        class="w-full bg-[#27262b] border border-[#1a181e] rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-[#2dd4bf]/30 transition-all resize-y"
+        class="search-input"
         placeholder="جستجوی آیکون..."
         autofocus
       />
-      <div
-        class="grid grid-cols-8 gap-y-3 max-h-[40vh] overflow-y-scroll mt-6 justify-items-center"
-      >
+      <div class="icon-grid">
         <button
           v-for="[name, IconComp] in filteredIcons"
           @click="selectIcon(name)"
-          class="rounded-xl bg-[#27262b] p-4 text-white hover:bg-[#26bba8] active:scale-[0.98] transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+          class="icon-button"
           :title="name"
           :key="name"
         >
-          <component :is="IconComp as Object" />
+          <component :is="IconComp" />
         </button>
       </div>
     </div>
   </Modal>
 </template>
+
+<style>
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  max-height: 40vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 1.5rem;
+  justify-items: center;
+  gap: 1em;
+}
+
+.icon-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.75rem;
+  background-color: #27262b;
+  padding: 1rem;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-button:hover {
+  background-color: #26bba8;
+}
+
+.icon-button:active {
+  transform: scale(0.98);
+}
+
+.icon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>

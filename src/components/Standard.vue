@@ -51,30 +51,21 @@ const handleSelect = (item: Observation) => {
 
 <template>
   <Modal v-model="isOpen">
-    <div
-      v-if="isOpen"
-      class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90%] md:w-[40%] lg:w-[30%] p-4 rounded-[20px] bg-[#161519] border border-white/10 backdrop-blur-xl shadow-2xl"
-    >
+    <div v-if="isOpen" class="modal-container">
       <input
         v-model.trim="search"
-        class="w-full bg-[#27262b] border border-[#1a181e] direction-rtl rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-[#2dd4bf]/30 transition-all resize-y"
+        class="search-input"
         placeholder="جستجو کنید..."
         dir="rtl"
       />
 
-      <div
-        v-if="isLoading"
-        class="w-full h-1 bg-[#27262b] rounded-full mt-4 overflow-hidden"
-      >
-        <div class="progress-line h-full bg-[#2dd4bf]"></div>
+      <div v-if="isLoading" class="loading-container">
+        <div class="progress-line"></div>
       </div>
 
-      <ul class="w-full h-[40vh] grid gap-3 mt-6 overflow-y-scroll">
+      <ul class="items-list">
         <li v-for="item in standards" :key="item.code">
-          <button
-            class="rounded-xl w-full bg-[#27262b] p-4 text-white hover:bg-[#26bba8] active:scale-[0.98] transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            @click="() => handleSelect(item)"
-          >
+          <button class="item-button" @click="() => handleSelect(item)">
             {{
               locale === Locales.fa
                 ? item.display.fa || item.display.en
@@ -88,17 +79,38 @@ const handleSelect = (item: Observation) => {
 </template>
 
 <style scoped>
-.progress-line {
-  width: 30%;
-  animation: loading-animation 1.5s infinite ease-in-out;
+.items-list {
+  width: 100%;
+  height: 40vh;
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
 }
 
-@keyframes loading-animation {
-  0% {
-    transform: translateX(350%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+.item-button {
+  width: 100%;
+  border-radius: 0.75rem;
+  background-color: #27262b;
+  padding: 1rem;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.item-button:hover {
+  background-color: #26bba8;
+}
+
+.item-button:active {
+  transform: scale(0.98);
+}
+
+.item-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

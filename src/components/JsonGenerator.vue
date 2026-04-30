@@ -47,28 +47,24 @@ const handleClick = async () => {
 
 <template>
   <Modal v-model="isOpen" @after-enter="onAfterEnter">
-    <div
-      v-if="isOpen"
-      class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90%] md:w-[40%] lg:w-[30%] p-4 rounded-[20px] bg-[#161519] border border-white/10 backdrop-blur-xl shadow-2xl"
-    >
+    <div v-if="isOpen" class="modal-container">
       <textarea
-        rows="12"
+        rows="23"
+        cols="85"
         v-model="prompt"
         placeholder="لطفا دستور طراحی خود را وارد کنید..."
-        class="w-full bg-[#27262b] border border-[#1a181e] rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-[#2dd4bf]/30 transition-all resize-y"
+        class="prompt-textarea"
         ref="chatbox"
       ></textarea>
 
-      <div
-        v-if="isLoading"
-        class="w-full h-1 bg-[#27262b] rounded-full mt-4 overflow-hidden"
-      >
-        <div class="progress-line h-full bg-[#2dd4bf]"></div>
+      <div v-if="isLoading" class="loading-container">
+        <div class="progress-line"></div>
       </div>
-      <div class="flex gap-2 items-align-center mt-4">
+
+      <div class="action-wrapper">
         <button
           :disabled="isLoading"
-          class="w-full p-4 rounded-xl bg-[#2dd4bf] text-white font-bold hover:bg-[#26bba8] active:scale-[0.98] transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+          class="submit-button"
           @click.prevent="handleClick"
         >
           <span v-if="isLoading">در حال طراحی...</span>
@@ -80,17 +76,54 @@ const handleClick = async () => {
 </template>
 
 <style scoped>
-.progress-line {
-  width: 30%;
-  animation: loading-animation 1.5s infinite ease-in-out;
+.prompt-textarea {
+  background-color: #27262b;
+  border: 1px solid #1a181e;
+  border-radius: 1rem;
+  padding: 1rem;
+  color: white;
+  outline: none;
+  transition: all 0.2s;
+  resize: vertical;
 }
 
-@keyframes loading-animation {
-  0% {
-    transform: translateX(350%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+.prompt-textarea:focus {
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.3);
+}
+
+.action-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background-color: #2dd4bf;
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.submit-button:hover {
+  background-color: #26bba8;
+}
+
+.submit-button:active {
+  transform: scale(0.98);
+}
+
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

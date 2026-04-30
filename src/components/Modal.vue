@@ -7,24 +7,29 @@ defineProps<{
 </script>
 
 <template>
-  <div>
-    <Teleport to="body">
-      <Transition name="fade">
-        <div
-          v-if="show"
-          class="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm transition-opacity"
-          @click="show = false"
-        ></div>
-      </Transition>
-
-      <Transition name="pop" @after-enter="onAfterEnter">
-        <slot> </slot>
-      </Transition>
-    </Teleport>
-  </div>
+  <Transition name="fade">
+    <div v-if="show" class="backdrop" @click="show = false"></div>
+  </Transition>
+  <Transition name="pop" @after-enter="onAfterEnter">
+    <slot> </slot>
+  </Transition>
 </template>
 
 <style scoped>
+.backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9998;
+  background-color: rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(4px);
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .pop-enter-active,
 .pop-leave-active {
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);

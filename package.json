@@ -1,6 +1,6 @@
 {
   "name": "@yonus_amire01/form-builder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./dist/form-builder.umd.js",
   "module": "./dist/form-builder.mjs",
   "types": "./dist/types/index.d.ts",
@@ -31,7 +31,6 @@
     "src"
   ],
   "dependencies": {
-    "csv-parser": "^3.2.0",
     "lucide-vue-next": "^1.0.0",
     "survey-core": "^2.5.18",
     "survey-creator-core": "^2.5.18",

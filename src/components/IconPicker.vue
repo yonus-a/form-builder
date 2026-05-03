@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import useSurveyCreator from "../composables/useSurveyCreator";
-import { ref, computed, shallowRef, type Ref } from "vue";
+import {
+  ref,
+  computed,
+  shallowRef,
+  type Ref,
+  createApp,
+  type Component,
+} from "vue";
 import * as LucideIcons from "lucide-vue-next";
 import Modal from "./Modal.vue";
 
@@ -8,11 +15,13 @@ const search = ref("");
 const isOpen = ref(false);
 
 const creator = useSurveyCreator();
+const logoPickerContainer: Ref<HTMLElement | undefined> = ref();
 
 creator.survey.onAfterRenderHeader.add((_, options) => {
   const logoPicker: HTMLElement | null = options.htmlElement?.children?.[1];
   if (logoPicker) {
     // remove file input
+    logoPickerContainer.value = logoPicker;
     const fileInput = logoPicker.firstChild;
     if (fileInput) logoPicker.removeChild(fileInput);
 
@@ -34,8 +43,15 @@ const filteredIcons: Ref<[string, object][]> = computed(() => {
     .slice(0, 80);
 });
 
-const selectIcon = (name: string) => {
+const selectIcon = (name: string, Component: Component) => {
   creator.survey.icon = name;
+  const logoPicker = logoPickerContainer.value;
+
+  if (logoPicker) {
+    const iconPlaceholder = logoPicker.firstElementChild;
+    if (iconPlaceholder) createApp(Component).mount(iconPlaceholder);
+  }
+
   isOpen.value = false;
 };
 </script>
@@ -52,7 +68,7 @@ const selectIcon = (name: string) => {
       <div class="icon-grid">
         <button
           v-for="[name, IconComp] in filteredIcons"
-          @click="selectIcon(name)"
+          @click.prevent="selectIcon(name, IconComp)"
           class="icon-button"
           :title="name"
           :key="name"

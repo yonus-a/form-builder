@@ -27,7 +27,7 @@ const standardAction = new Action({
 });
 
 let timeout = null;
-watch(search, () => {
+watch(search, async () => {
   clearTimeout(timeout!);
   timeout = setTimeout(() => {
     props.onStandardSearch(search.value);
@@ -65,7 +65,7 @@ const handleSelect = (item: Observation) => {
 
       <ul class="items-list">
         <li v-for="item in standards" :key="item.code">
-          <button class="item-button" @click="() => handleSelect(item)">
+          <button class="item-button" @click.prevent="() => handleSelect(item)">
             {{
               locale === Locales.fa
                 ? item.display.fa || item.display.en

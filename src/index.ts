@@ -13,13 +13,12 @@ surveyLocalization.setupLocale({
   nativeName: "فارسی",
   englishName: "Farsi",
   strings: "فارسی",
+  rtl: true,
 });
 
-export {
-  DefaultDarkPanelless,
-  DefaultLightPanelless,
-} from "survey-core/themes";
+export type { CssVariables } from "./types/types";
 export { SurveyComponent } from "survey-vue3-ui";
+export { getThemes } from "./themes/theme";
 export type * from "./types/lonic";
 export * from "survey-core";
 

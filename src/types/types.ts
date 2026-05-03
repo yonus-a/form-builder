@@ -8,7 +8,19 @@ export enum Locales {
 }
 
 export type JsonGeneratorParams = {
+  stream: boolean;
   prompt: string;
   model: string;
-  stream: boolean;
+};
+
+export type CssVariables = {
+  DarkSsecondaryBackground: string;
+  DarkPrimaryBackground: string;
+  questionFontSize: string;
+  creatorRadius: string;
+  primaryColor: string;
+  errorColor: string;
+  fontFamily: string;
+  fontSize: string;
+  radius: string;
 };

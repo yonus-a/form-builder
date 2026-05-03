@@ -2,6 +2,28 @@
   font-weight: normal !important;
 }
 
+.svc-creator {
+  border: 1px solid #5555;
+  border-radius: var(--sjs2-radius-x200);
+  padding: calc(var(--sjs2-radius-x200) - 0.7em);
+}
+
+.svd-simulator-content .sd-root-modern {
+  background-color: var(--sjs2-palette-gray-800) !important;
+}
+
+.svd-simulator-content .sd-question {
+  background-color: var(--sjs2-palette-gray-900) !important;
+}
+
+.svd-simulator-content .sd-input {
+  background-color: var(--sjs2-palette-gray-800) !important;
+}
+
+.svc-toolbox__panel {
+  border-left: none;
+}
+
 .svc-creator__non-commercial-text {
   display: none;
 }
@@ -20,6 +42,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(24px);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  min-width: 600px;
 }
 
 @media (max-width: 768px) {

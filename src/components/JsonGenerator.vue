@@ -49,8 +49,8 @@ const handleClick = async () => {
   <Modal v-model="isOpen" @after-enter="onAfterEnter">
     <div v-if="isOpen" class="modal-container">
       <textarea
-        rows="23"
-        cols="85"
+        rows="20"
+        cols="80"
         v-model="prompt"
         placeholder="لطفا دستور طراحی خود را وارد کنید..."
         class="prompt-textarea"
@@ -77,7 +77,7 @@ const handleClick = async () => {
 
 <style scoped>
 .prompt-textarea {
-  background-color: #27262b;
+  background-color: var(--sjs2-palette-gray-800);
   border: 1px solid #1a181e;
   border-radius: 1rem;
   padding: 1rem;

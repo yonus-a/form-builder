@@ -8,6 +8,15 @@
   padding: calc(var(--sjs2-radius-x200) - 0.7em);
 }
 
+.sd-input--error {
+  background-color: var(--sjs-general-backcolor);
+  border: 1px solid var(--sjs-special-red-light);
+}
+
+.sd-error {
+  background-color: transparent !important;
+}
+
 .svd-simulator-content .sd-root-modern {
   background-color: var(--sjs2-palette-gray-800) !important;
 }

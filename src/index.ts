@@ -1,3 +1,4 @@
+import useScrollToError from "./composables/useScrollToError";
 import { SurveySchemaPrompt } from "./utils/prefixPrompts";
 import FormBuilder from "./components/FormBuilder.vue";
 import { surveyLocalization } from "survey-core";
@@ -22,4 +23,4 @@ export { getThemes } from "./themes/theme";
 export type * from "./types/lonic";
 export * from "survey-core";
 
-export { FormBuilder, SurveySchemaPrompt };
+export { FormBuilder, SurveySchemaPrompt, useScrollToError };

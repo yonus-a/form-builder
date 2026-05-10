@@ -9,12 +9,18 @@ const props = withDefaults(
     searchable?: boolean;
     placeholder?: string;
     modelValue?: string;
+    labelPrev?: string;
+    labelNext?: string;
+    labelEmpty?: string;
   }>(),
   {
     pageSize: 10,
     searchable: false,
     placeholder: "",
     modelValue: "",
+    labelPrev: "قبلی",
+    labelNext: "بعدی",
+    labelEmpty: "موردی یافت نشد",
   }
 );
 
@@ -87,7 +93,7 @@ function nextPage() {
         {{ choice.text }}
       </li>
       <li v-if="pagedChoices.length === 0" class="paginated-dropdown__empty">
-        موردی یافت نشد
+        {{ labelEmpty }}
       </li>
     </ul>
 
@@ -97,7 +103,7 @@ function nextPage() {
         :disabled="currentPage <= 1"
         @click="prevPage"
       >
-        قبلی
+        {{ labelPrev }}
       </button>
       <span class="paginated-dropdown__page-info">
         {{ currentPage }} / {{ totalPages }}
@@ -107,7 +113,7 @@ function nextPage() {
         :disabled="currentPage >= totalPages"
         @click="nextPage"
       >
-        بعدی
+        {{ labelNext }}
       </button>
     </div>
   </div>

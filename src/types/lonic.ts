@@ -54,6 +54,7 @@ export enum ELEMENTS {
   rating = "rating",
   number = "number",
   text = "text",
+  paginateddropdown = "paginateddropdown",
 }
 
 export const ScaleTypeMapToElement: Partial<Record<LOINCSCALETYPES, ELEMENTS>> =
@@ -135,7 +136,8 @@ export type FormElements =
   | NumberElement
   | RadioGroupElement
   | CheckboxElement
-  | RatingElement;
+  | RatingElement
+  | PaginatedDropdownElement;
 
 export type BaseElement = {
   maskType?: "numeric" | "pattern";
@@ -205,3 +207,11 @@ type Validator = {
   maxValue?: 300;
   text: string;
 };
+
+export interface PaginatedDropdownElement extends BaseElement {
+  type: "paginateddropdown";
+  choices: Choice[];
+  pageSize?: number;
+  searchable?: boolean;
+  placeholder?: string;
+}

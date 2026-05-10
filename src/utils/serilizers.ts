@@ -1,4 +1,5 @@
 import { Serializer } from "survey-core";
+import "./paginatedDropdown";
 
 Serializer.addProperty("survey", {
   isSerializable: true,

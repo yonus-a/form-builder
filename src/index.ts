@@ -23,4 +23,5 @@ export { getThemes } from "./themes/theme";
 export type * from "./types/lonic";
 export * from "survey-core";
 
+export { QuestionPaginatedDropdownModel } from "./utils/paginatedDropdown";
 export { FormBuilder, SurveySchemaPrompt, useScrollToError };

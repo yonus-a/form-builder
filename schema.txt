@@ -85,3 +85,20 @@
   "maxSelectedChoices": 2,
   "minSelectedChoices": 1
 }
+
+سوال dropdown صفحه‌بندی شده (paginateddropdown)
+
+{
+  "type": "paginateddropdown",
+  "name": "question_1",
+  "title": "یک گزینه را انتخاب کنید",
+  "isRequired": true,
+  "pageSize": 5,
+  "searchable": true,
+  "placeholder": "جستجو کنید...",
+  "choices": [
+    { "value": "1", "text": "گزینه اول" },
+    { "value": "2", "text": "گزینه دوم" },
+    { "value": "3", "text": "گزینه سوم" }
+  ]
+}

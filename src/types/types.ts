@@ -24,3 +24,14 @@ export type CssVariables = {
   fontSize: string;
   radius: string;
 };
+
+export type advancedQuestion = {
+  name: string;
+  data: {
+    title: string;
+    vaule: string;
+  };
+  page: number;
+  limit: number;
+  handleSearch: string;
+};

@@ -6,7 +6,7 @@ import { DefaultDark, DefaultLight } from "survey-creator-core/themes";
 import type { CssVariables } from "../types/types";
 
 export const getThemes = (variables: CssVariables) => {
-  if (!Object.keys(variables).length) {
+  if (!variables || !Object.keys(variables).length) {
     return {
       SurveyLightTheme: DefaultLightPanelless,
       SurveyDarkTheme: DefaultDarkPanelless,

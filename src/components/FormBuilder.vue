@@ -27,10 +27,15 @@ const props = defineProps<{
 
 const creator = useSurveyCreator();
 
-const {SurveyCratorDarkTheme, SurveyCratorLightTheme} = getThemes(props.cssVariables);
+const { SurveyCratorDarkTheme, SurveyCratorLightTheme } = getThemes(
+  props.cssVariables,
+);
 
 // apply theme and locale
-creator.applyCreatorTheme(props.theme === "dark" ? SurveyCratorDarkTheme : SurveyCratorLightTheme);
+creator.applyCreatorTheme(
+  props.theme === "dark" ? SurveyCratorDarkTheme : SurveyCratorLightTheme,
+);
+
 creator.locale = props.locale;
 
 creator.saveSurveyFunc = () => {

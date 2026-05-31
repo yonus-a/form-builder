@@ -46,7 +46,15 @@ creator.saveSurveyFunc = () => {
 
 watch(
   () => props.json,
-  () => (creator.JSON = props.json),
+  () => {
+    if (props.json) {
+      creator.JSON = props.json;
+    }
+  },
+  {
+    immediate: true,
+    deep: true,
+  },
 );
 </script>
 

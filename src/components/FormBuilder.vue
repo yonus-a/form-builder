@@ -24,7 +24,7 @@ const props = defineProps<{
   standards?: Observation[];
   locale: string | Locales;
   theme: string | Themes;
-  json?: string;
+  json?: object;
 }>();
 
 const creator = useSurveyCreator();

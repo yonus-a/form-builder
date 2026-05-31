@@ -11,6 +11,7 @@ import IconPicker from "./IconPicker.vue";
 import "survey-creator-core/i18n/persian";
 import Standard from "./Standard.vue";
 import "../utils/serilizers";
+import { watch } from "vue";
 
 const emit = defineEmits(["update"]);
 
@@ -23,6 +24,7 @@ const props = defineProps<{
   standards?: Observation[];
   locale: string | Locales;
   theme: string | Themes;
+  json?: string;
 }>();
 
 const creator = useSurveyCreator();
@@ -41,6 +43,11 @@ creator.locale = props.locale;
 creator.saveSurveyFunc = () => {
   emit("update", creator.JSON);
 };
+
+watch(
+  () => props.json,
+  () => (creator.JSON = props.json),
+);
 </script>
 
 <template>

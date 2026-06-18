@@ -41,15 +41,16 @@ export type SurveyConfig = {
 };
 
 export type CssVariables = {
-  DarkSsecondaryBackground: string;
-  DarkPrimaryBackground: string;
-  questionFontSize: string;
-  creatorRadius: string;
-  primaryColor: string;
-  errorColor: string;
-  fontFamily: string;
-  fontSize: string;
-  radius: string;
+  DarkSsecondaryBackground?: string;
+  DarkPrimaryBackground?: string;
+  questionFontSize?: string;
+  creatorRadius?: string;
+  primaryColor?: string;
+  errorColor?: string;
+  fontFamily?: string;
+  fontWeight?: string;
+  fontSize?: string;
+  radius?: string;
 };
 
 export type advancedQuestion = {

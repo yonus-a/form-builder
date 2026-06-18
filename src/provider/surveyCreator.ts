@@ -3,7 +3,7 @@ import type {
   SurveyCreatorModel as SurveyCreatorModelType,
 } from "survey-creator-core";
 import { inject, provide, type InjectionKey } from "vue";
-import { getServeyCreatorTheme } from "../themes/factory";
+import { getServeyCreatorTheme, getServeyTheme } from "../themes/factory";
 import { SurveyCreatorModel } from "survey-creator-core";
 import { useSurveyConfig } from "./surveyConfig";
 import immediateWatch from "../utils/immediateWatch";
@@ -34,12 +34,12 @@ export function initSurveyCreator(
 
   immediateWatch([config.locale], () => (creator.locale = config.locale.value));
   immediateWatch([config.colorMode], () => {
-    creator.applyCreatorTheme(
-      getServeyCreatorTheme({
-        colorMode: config.colorMode.value,
-        cssVariable: config.cssVariable,
-      }),
-    );
+    const themeArgs = {
+      colorMode: config.colorMode.value,
+      cssVariable: config.cssVariable,
+    };
+    creator.applyCreatorTheme(getServeyCreatorTheme(themeArgs));
+    creator.applyTheme(getServeyTheme(themeArgs) as any);
   });
 
   provide(SURVEY_CREATOR_KEY, creator);

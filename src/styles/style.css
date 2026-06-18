@@ -17,18 +17,6 @@
   background-color: transparent !important;
 }
 
-.svd-simulator-content .sd-root-modern {
-  background-color: var(--sjs2-palette-gray-800) !important;
-}
-
-.svd-simulator-content .sd-question {
-  background-color: var(--sjs2-palette-gray-900) !important;
-}
-
-.svd-simulator-content .sd-input {
-  background-color: var(--sjs2-palette-gray-800) !important;
-}
-
 .svc-toolbox__panel {
   border-left: none;
 }

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import useSurveyCreator from "../composables/useSurveyCreator";
+import { useSurveyCreator } from "../provider/surveyCreator.ts";
+import useCreatorToolbarAction from "../composables/useCreatorToolbarAction";
 import type { SurveyCreatorModel } from "survey-creator-core";
 import { ref, useTemplateRef } from "vue";
-import { Action } from "survey-core";
 import Modal from "./Modal.vue";
 
 const props = defineProps<{
@@ -16,15 +16,13 @@ const prompt = ref("");
 
 const creator = useSurveyCreator();
 
-const chatAiAction = new Action({
+useCreatorToolbarAction(creator, {
   id: "chat-ai",
   iconName: "pg-specific-24x24",
   action: () => {
     isOpen.value = !isOpen.value;
   },
 });
-
-creator.toolbar.actions.push(chatAiAction);
 
 const onAfterEnter = () => {
   textareaRef.value?.focus();

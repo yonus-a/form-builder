@@ -1,5 +1,6 @@
 import type { ElementGetActionsEvent } from "survey-creator-core";
-import useSurveyCreator from "./useSurveyCreator";
+import { useSurveyCreator } from "../provider/surveyCreator";
+import useCreatorEvent from "./useCreatorEvent";
 import { Action } from "survey-core";
 
 export default function useStandardChanger() {
@@ -16,7 +17,7 @@ export default function useStandardChanger() {
     },
   });
 
-  creator.onElementGetActions.add((_, options) => {
+  useCreatorEvent(creator.onElementGetActions, (_: any, options: any) => {
     element = options.element;
     options.actions.push(StandardChangerAction);
   });

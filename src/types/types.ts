@@ -1,16 +1,43 @@
-export enum Themes {
+import type { ComputedRef, Ref } from "vue";
+
+export enum ThemeModes {
   dark = "dark",
   light = "light",
 }
+
 export enum Locales {
   fa = "fa",
   en = "en",
 }
 
+export interface ColorModeInstance {
+  preference: string;
+  unknown: boolean;
+  forced: boolean;
+  value: string;
+}
+
+export type Locale = Ref<string> | ComputedRef<string>;
+export type ColorMode =
+  | ColorModeInstance
+  | Ref<ThemeModes>
+  | ComputedRef<ThemeModes>;
+
 export type JsonGeneratorParams = {
   stream: boolean;
   prompt: string;
   model: string;
+};
+
+export type Theme = {
+  cssVariable: CssVariables;
+  colorMode: string;
+};
+
+export type SurveyConfig = {
+  cssVariable: CssVariables;
+  colorMode: ColorMode;
+  locale: Locale;
 };
 
 export type CssVariables = {

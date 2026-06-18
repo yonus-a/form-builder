@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import useSurveyCreator from "../composables/useSurveyCreator";
+import { useSurveyCreator } from "../provider/surveyCreator.ts";
+import useCreatorToolbarAction from "../composables/useCreatorToolbarAction";
 import type { Observation } from "../types/lonic";
 import { Locales } from "../types/types";
-import { Action } from "survey-core";
 import Modal from "./Modal.vue";
-import { ref, watch } from "vue";
+import { onScopeDispose, ref, watch } from "vue";
 
 const props = defineProps<{
   onStandardSearch: (text: string) => void;
@@ -18,7 +18,7 @@ const search = ref("");
 
 const creator = useSurveyCreator();
 
-const standardAction = new Action({
+useCreatorToolbarAction(creator, {
   id: "standard",
   iconName: "toolbox-dynamicpanel-24x24",
   action: () => {
@@ -26,15 +26,17 @@ const standardAction = new Action({
   },
 });
 
-let timeout = null;
-watch(search, async () => {
-  clearTimeout(timeout!);
+let timeout: ReturnType<typeof setTimeout> | null = null;
+watch(search, () => {
+  if (timeout) clearTimeout(timeout);
   timeout = setTimeout(() => {
     props.onStandardSearch(search.value);
   }, 800);
 });
 
-creator.toolbar.actions.push(standardAction);
+onScopeDispose(() => {
+  if (timeout) clearTimeout(timeout);
+});
 
 const handleSelect = (item: Observation) => {
   if (item.formSchemaElements) {

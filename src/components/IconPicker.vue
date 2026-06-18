@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import useSurveyCreator from "../composables/useSurveyCreator";
+import { useSurveyCreator } from "../provider/surveyCreator.ts";
+import useCreatorEvent from "../composables/useCreatorEvent";
 import {
   ref,
   computed,
   shallowRef,
+  onScopeDispose,
   type Ref,
   createApp,
+  type App,
   type Component,
 } from "vue";
 import * as LucideIcons from "lucide-vue-next";
@@ -17,7 +20,12 @@ const isOpen = ref(false);
 const creator = useSurveyCreator();
 const logoPickerContainer: Ref<HTMLElement | undefined> = ref();
 
-creator.survey.onAfterRenderHeader.add((_, options) => {
+const onLogoPickerClick = (e: Event) => {
+  e.preventDefault();
+  isOpen.value = !isOpen.value;
+};
+
+useCreatorEvent(creator.survey.onAfterRenderHeader, (_: any, options: any) => {
   const logoPicker: HTMLElement | null = options.htmlElement?.children?.[1];
   if (logoPicker) {
     // remove file input
@@ -25,11 +33,12 @@ creator.survey.onAfterRenderHeader.add((_, options) => {
     const fileInput = logoPicker.firstChild;
     if (fileInput) logoPicker.removeChild(fileInput);
 
-    logoPicker.addEventListener("click", (e) => {
-      e.preventDefault();
-      isOpen.value = !isOpen.value;
-    });
+    logoPicker.addEventListener("click", onLogoPickerClick);
   }
+});
+
+onScopeDispose(() => {
+  logoPickerContainer.value?.removeEventListener("click", onLogoPickerClick);
 });
 
 const ALL_ICONS = shallowRef(LucideIcons);
@@ -43,17 +52,28 @@ const filteredIcons: Ref<[string, object][]> = computed(() => {
     .slice(0, 80);
 });
 
+let mountedIconApp: App | null = null;
+
 const selectIcon = (name: string, Component: Component) => {
   creator.survey.icon = name;
   const logoPicker = logoPickerContainer.value;
 
   if (logoPicker) {
     const iconPlaceholder = logoPicker.firstElementChild;
-    if (iconPlaceholder) createApp(Component).mount(iconPlaceholder);
+    if (iconPlaceholder) {
+      mountedIconApp?.unmount();
+      mountedIconApp = createApp(Component);
+      mountedIconApp.mount(iconPlaceholder);
+    }
   }
 
   isOpen.value = false;
 };
+
+onScopeDispose(() => {
+  mountedIconApp?.unmount();
+  mountedIconApp = null;
+});
 </script>
 
 <template>

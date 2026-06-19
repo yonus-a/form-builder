@@ -1,28 +1,86 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
+import type {
+  AsyncDropdownHandlers,
+  ItemType,
+} from "../types/asyncDropdown";
 
 defineOptions({
   inheritAttrs: false,
 });
 
-const show = ref(false);
 const props = defineProps<{ question: any }>();
-const handlers = props.question.handlers;
+const handlers = props.question.handlers as AsyncDropdownHandlers | null;
+
+const show = ref(false);
+const searchValue = ref("");
+
+const items = computed<ItemType[]>(() => handlers?.items.value ?? []);
+const currentPage = computed(() => handlers?.currentPage.value ?? 0);
+const totalPages = computed(() => handlers?.totalPages.value ?? 0);
+
+const selectedText = computed(() => {
+  const v = props.question.value;
+  if (v === undefined || v === null) return "";
+  return items.value.find((i) => i.value === v)?.text ?? "";
+});
+
+const inputDisplay = computed(() =>
+  show.value ? searchValue.value : selectedText.value,
+);
+
+function onSearchInput(e: Event) {
+  const query = (e.target as HTMLInputElement).value;
+  searchValue.value = query;
+  handlers?.handleSearch(query);
+}
+
+function onSelect(item: ItemType) {
+  props.question.value = item.value;
+  searchValue.value = "";
+  show.value = false;
+}
+
+function onFocus() {
+  show.value = true;
+}
+
+function onBlur() {
+  // delay so that mousedown on a list item can resolve before close
+  setTimeout(() => {
+    show.value = false;
+    searchValue.value = "";
+  }, 150);
+}
+
+function onNext() {
+  if (currentPage.value >= totalPages.value) return;
+  handlers?.handleNextPage();
+}
+
+function onPrev() {
+  if (currentPage.value <= 1) return;
+  handlers?.handlePrevPage();
+}
 </script>
 
 <template>
   <div class="sd-selectbase">
     <div class="sv-dropdown_select-wrapper">
-      <div class="sd-input sd-dropdown sd-dropdown--empty" ref="inputRef">
+      <div
+        class="sd-input sd-dropdown"
+        :class="{ 'sd-dropdown--empty': !selectedText }"
+      >
         <div class="sd-dropdown__value">
           <input
             type="text"
             class="sd-dropdown__filter-string-input"
+            :value="inputDisplay"
             :aria-expanded="show ? 'true' : 'false'"
-            @input="handlers?.handleSearch"
+            @input="onSearchInput"
+            @focus="onFocus"
+            @blur="onBlur"
             placeholder="Select..."
-            @focus="show = true"
-            @blur="show = false"
             aria-required="false"
             aria-invalid="false"
             autocomplete="off"
@@ -66,7 +124,7 @@ const handlers = props.question.handlers;
                   <div class="sv-list__container sd-list">
                     <div
                       class="sv-list__empty-container"
-                      v-if="!handlers?.items?.length"
+                      v-if="!items.length"
                     >
                       <div
                         class="sv-list__empty-text"
@@ -79,14 +137,24 @@ const handlers = props.question.handlers;
                       <li
                         role="option"
                         class="sv-list__item sd-list__item sv-list__item-text--wrap"
-                        v-for="choice in handlers?.items"
-                        aria-selected="false"
+                        :class="{
+                          'sv-list__item--selected':
+                            choice.value === props.question.value,
+                        }"
+                        v-for="choice in items"
+                        :key="choice.value"
+                        :aria-selected="
+                          choice.value === props.question.value
+                            ? 'true'
+                            : 'false'
+                        "
                         tabindex="-1"
+                        @mousedown.prevent="onSelect(choice)"
                       >
                         <div
                           style="--sjs-list-item-level: 1"
                           class="sv-list__item-body sd-list__item-body"
-                          title="Item 1"
+                          :title="choice.text"
                         >
                           <span class="sv-string-viewer">
                             {{ choice.text }}
@@ -94,10 +162,11 @@ const handlers = props.question.handlers;
                         </div>
                       </li>
                     </ul>
-                    <div class="pagination">
+                    <div class="pagination" v-if="totalPages > 0">
                       <button
                         class="sd-editor-button-item sd-editor-button-item--pressed"
-                        @click="handlers?.handleNextPage"
+                        :disabled="currentPage >= totalPages"
+                        @mousedown.prevent="onNext"
                       >
                         <svg
                           class="sv-svg-icon sv-editor-button-item__icon"
@@ -107,13 +176,11 @@ const handlers = props.question.handlers;
                           <title>Next</title>
                         </svg>
                       </button>
-                      <span
-                        >{{ handlers?.currentPage || 0 }} /
-                        {{ handlers?.totalPages || 0 }}</span
-                      >
+                      <span>{{ currentPage }} / {{ totalPages }}</span>
                       <button
                         class="sd-editor-button-item sd-editor-button-item--pressed"
-                        @click="handlers?.handlePrevPage"
+                        :disabled="currentPage <= 1"
+                        @mousedown.prevent="onPrev"
                       >
                         <svg
                           class="sv-svg-icon sv-editor-button-item__icon"
@@ -155,9 +222,16 @@ const handlers = props.question.handlers;
   padding: 1em;
   display: flex;
   border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
-.pagination button:hover {
-  background-color: var(--darkreader-bg--sjs2-palette-gray-800);
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination button:not(:disabled):hover {
+  background-color: var(--sjs-general-backcolor-dim, rgba(0, 0, 0, 0.05));
 }
 </style>

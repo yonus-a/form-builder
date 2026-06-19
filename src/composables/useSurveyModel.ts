@@ -5,8 +5,9 @@ import useScrollToError from "./useScrollToError";
 import { Model, SurveyModel } from "survey-core";
 
 export function useSurveyModel(): SurveyModel {
-  const config = useSurveyConfig();
   const survey = new Model();
+
+  const config = useSurveyConfig();
 
   useScrollToError(survey);
   immediateWatch([config.locale], () => (survey.locale = config.locale.value));

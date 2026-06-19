@@ -14,7 +14,7 @@ export default function registerAsyncDropdown(
       return type;
     }
 
-    setHnalders(handlers: AsyncDropdownHandlers): void {
+    setHandlers(handlers: AsyncDropdownHandlers): void {
       this._handlers = handlers;
     }
 
@@ -25,12 +25,17 @@ export default function registerAsyncDropdown(
 
   ElementFactory.Instance.registerElement(type, (name) => {
     const model = new AsyncDropdownModel(name);
-    model.setHnalders(handlers);
+    model.setHandlers(handlers);
     return model;
   });
 
   Serializer.addClass(type, [], () => new AsyncDropdownModel(""), "question");
 
-  const app = getCurrentInstance()!.appContext.app;
-  app.component("survey-" + type, AsyncDropdown);
+  const instance = getCurrentInstance();
+  if (!instance) {
+    throw new Error(
+      "registerAsyncDropdown() must be called from within a component's setup()",
+    );
+  }
+  instance.appContext.app.component("survey-" + type, AsyncDropdown);
 }

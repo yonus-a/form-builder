@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { useSurveyCreator } from "../provider/surveyCreator.ts";
-import useCreatorToolbarAction from "../composables/useCreatorToolbarAction";
-import type { SurveyCreatorModel } from "survey-creator-core";
+import useCreatorToolbarAction from "../composables/useCreatorToolbarAction.ts";
 import { ref, useTemplateRef } from "vue";
 import Modal from "./Modal.vue";
-
-const props = defineProps<{
-  onGenerateBtnClick: (prompt: string) => SurveyCreatorModel["JSON"];
-}>();
+import { useSurveyAiAssistantConfig } from "../provider/aiAssistantConfig.ts";
 
 const textareaRef = useTemplateRef("chatbox");
 const isLoading = ref(false);
@@ -15,6 +11,7 @@ const isOpen = ref(false);
 const prompt = ref("");
 
 const creator = useSurveyCreator();
+const config = useSurveyAiAssistantConfig();
 
 useCreatorToolbarAction(creator, {
   id: "chat-ai",
@@ -33,7 +30,7 @@ const handleClick = async () => {
 
   try {
     isLoading.value = true;
-    const schema = await props.onGenerateBtnClick(prompt.value);
+    const schema = config.onSubmit(prompt.value);
     creator.JSON = schema;
   } catch (error) {
   } finally {

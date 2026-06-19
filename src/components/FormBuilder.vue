@@ -1,22 +1,35 @@
 <script setup lang="ts">
 import { initSurveyCreator } from "../provider/surveyCreator.ts";
 import { SurveyCreatorComponent } from "survey-creator-vue";
+import AiAssistant from "./AiAssistant.vue";
 import IconPicker from "./IconPicker.vue";
 import "survey-creator-core/i18n/persian";
+import Standard from "./Standard.vue";
 import "../utils/serilizers";
+import { watch } from "vue";
 
-const emit = defineEmits(["update"]);
+const json = defineModel<object>("json");
 const creator = initSurveyCreator();
+
+creator.saveSurveyFunc = () => {
+  json.value = creator.JSON;
+};
+
+watch(
+  json,
+  (val) => {
+    if (val) creator.JSON = val;
+  },
+  {
+    immediate: true,
+    deep: true,
+  },
+);
 </script>
 
 <template>
   <IconPicker />
-  <!-- <JsonGenerator @generateBtnClick="props.onGenerateJsonBtnClick" />
-  <Standard
-    v-if="standards && onStandardSearch"
-    :onStandardSearch
-    :locale="locale"
-    :standards
-  />-->
+  <AiAssistant />
+  <Standard />
   <SurveyCreatorComponent :model="creator" />
 </template>

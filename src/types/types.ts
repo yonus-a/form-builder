@@ -1,4 +1,6 @@
+import type { SurveyCreatorModel } from "survey-creator-core";
 import type { ComputedRef, Ref } from "vue";
+import type { Observation } from "./lonic";
 
 export enum ThemeModes {
   dark = "dark",
@@ -25,8 +27,9 @@ export type ColorMode =
 
 export type JsonGeneratorParams = {
   stream: boolean;
-  prompt: string;
-  model: string;
+  cssVariable: CssVariables;
+  colorMode: ColorMode;
+  locale: Locale;
 };
 
 export type Theme = {
@@ -38,6 +41,15 @@ export type SurveyConfig = {
   cssVariable: CssVariables;
   colorMode: ColorMode;
   locale: Locale;
+};
+
+export type SurveyAiAssitantConfig = {
+  onSubmit: (prompt: string) => SurveyCreatorModel["JSON"];
+};
+
+export type SurveyStandardConfig = {
+  onSearch: (text: string) => void;
+  standards: Observation[];
 };
 
 export type CssVariables = {

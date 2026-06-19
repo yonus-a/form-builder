@@ -4,8 +4,8 @@ import { getServeyTheme } from "../themes/factory";
 import useScrollToError from "./useScrollToError";
 import { Model, SurveyModel } from "survey-core";
 
-export function useSurveyModel(): SurveyModel {
-  const survey = new Model();
+export function useSurveyModel(jsonObj: object): SurveyModel {
+  const survey = new Model(jsonObj);
 
   const config = useSurveyConfig();
 

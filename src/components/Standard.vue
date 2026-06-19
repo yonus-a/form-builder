@@ -5,18 +5,16 @@ import type { Observation } from "../types/lonic";
 import { Locales } from "../types/types";
 import Modal from "./Modal.vue";
 import { onScopeDispose, ref, watch } from "vue";
-
-const props = defineProps<{
-  onStandardSearch: (text: string) => void;
-  locale: string | Locales;
-  standards: Observation[];
-}>();
+import { useSurveyStandardConfig } from "../provider/standardConfig.ts";
+import { useSurveyConfig } from "../provider/surveyConfig.ts";
 
 const isLoading = ref(false);
 const isOpen = ref(false);
 const search = ref("");
 
 const creator = useSurveyCreator();
+const config = useSurveyStandardConfig();
+const { locale } = useSurveyConfig();
 
 useCreatorToolbarAction(creator, {
   id: "standard",
@@ -30,7 +28,7 @@ let timeout: ReturnType<typeof setTimeout> | null = null;
 watch(search, () => {
   if (timeout) clearTimeout(timeout);
   timeout = setTimeout(() => {
-    props.onStandardSearch(search.value);
+    config.onSearch(search.value);
   }, 800);
 });
 
@@ -66,7 +64,7 @@ const handleSelect = (item: Observation) => {
       </div>
 
       <ul class="items-list">
-        <li v-for="item in standards" :key="item.code">
+        <li v-for="item in config.standards" :key="item.code">
           <button class="item-button" @click.prevent="() => handleSelect(item)">
             {{
               locale === Locales.fa

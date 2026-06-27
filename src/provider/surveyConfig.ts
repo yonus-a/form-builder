@@ -1,5 +1,5 @@
 import { inject, provide, type InjectionKey } from "vue";
-import type { SurveyConfig } from "../types/types";
+import type { SurveyConfig } from "../types";
 
 const SURVEY_CONFIG: InjectionKey<SurveyConfig> = Symbol("survey_config");
 

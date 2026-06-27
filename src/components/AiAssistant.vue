@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useSurveyCreator } from "../provider/surveyCreator.ts";
 import useCreatorToolbarAction from "../composables/useCreatorToolbarAction.ts";
+import { useSurveyAiAssistantConfig } from "../provider/aiAssistantConfig.ts";
 import { ref, useTemplateRef } from "vue";
 import Modal from "./Modal.vue";
-import { useSurveyAiAssistantConfig } from "../provider/aiAssistantConfig.ts";
 
 const textareaRef = useTemplateRef("chatbox");
 const isLoading = ref(false);

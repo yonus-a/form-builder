@@ -4,7 +4,6 @@ import { SurveyCreatorComponent } from "survey-creator-vue";
 import AiAssistant from "./AiAssistant.vue";
 import IconPicker from "./IconPicker.vue";
 import "survey-creator-core/i18n/persian";
-import Standard from "./Standard.vue";
 import "../utils/serilizers";
 import { watch } from "vue";
 
@@ -30,6 +29,5 @@ watch(
 <template>
   <IconPicker />
   <AiAssistant />
-  <Standard />
   <SurveyCreatorComponent :model="creator" />
 </template>

@@ -1,5 +1,5 @@
 import { getCurrentInstance } from "vue";
-import type { AsyncDropdownHandlers } from "../types/asyncDropdown";
+import type { AsyncDropdownHandlers } from "../types";
 import { ElementFactory, Question, Serializer } from "survey-core";
 import AsyncDropdown from "../components/AsyncDropdown.vue";
 
@@ -8,26 +8,19 @@ export default function registerAsyncDropdown(
   handlers: AsyncDropdownHandlers,
 ) {
   class AsyncDropdownModel extends Question {
-    private _handlers: AsyncDropdownHandlers | null = null;
-
     getType(): string {
       return type;
     }
 
-    setHandlers(handlers: AsyncDropdownHandlers): void {
-      this._handlers = handlers;
-    }
-
-    get handlers(): AsyncDropdownHandlers | null {
-      return this._handlers;
+    get handlers(): AsyncDropdownHandlers {
+      return handlers;
     }
   }
 
-  ElementFactory.Instance.registerElement(type, (name) => {
-    const model = new AsyncDropdownModel(name);
-    model.setHandlers(handlers);
-    return model;
-  });
+  ElementFactory.Instance.registerElement(
+    type,
+    (name) => new AsyncDropdownModel(name),
+  );
 
   Serializer.addClass(type, [], () => new AsyncDropdownModel(""), "question");
 
@@ -37,5 +30,6 @@ export default function registerAsyncDropdown(
       "registerAsyncDropdown() must be called from within a component's setup()",
     );
   }
+
   instance.appContext.app.component("survey-" + type, AsyncDropdown);
 }

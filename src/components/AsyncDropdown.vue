@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import type {
-  AsyncDropdownHandlers,
-  ItemType,
-} from "../types/asyncDropdown";
+import type { AsyncDropdownHandlers, ItemType } from "../types";
 
 defineOptions({
   inheritAttrs: false,
@@ -46,7 +43,6 @@ function onFocus() {
 }
 
 function onBlur() {
-  // delay so that mousedown on a list item can resolve before close
   setTimeout(() => {
     show.value = false;
     searchValue.value = "";
@@ -122,10 +118,7 @@ function onPrev() {
               <div class="sv-popup__scrolling-content">
                 <div class="sv-popup__content">
                   <div class="sv-list__container sd-list">
-                    <div
-                      class="sv-list__empty-container"
-                      v-if="!items.length"
-                    >
+                    <div class="sv-list__empty-container" v-if="!items.length">
                       <div
                         class="sv-list__empty-text"
                         aria-label="No data to display"

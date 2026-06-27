@@ -110,14 +110,147 @@ the question `type`. Reference it in any survey JSON:
 
 ### Handler contract
 
-| Field            | Type                       | Notes                                              |
-| ---------------- | -------------------------- | -------------------------------------------------- |
-| `items`          | `Ref<ItemType[]>`          | Current page of options — `{ value, text }`        |
-| `currentPage`    | `Ref<number>`              | 1-based current page                               |
-| `totalPages`     | `Ref<number>`              | Total page count; set `0` to hide the pager        |
-| `handleSearch`   | `(query: string) => void`  | Called on every keystroke — debounce if needed     |
-| `handleNextPage` | `() => void`               | Called when the next button is pressed             |
-| `handlePrevPage` | `() => void`               | Called when the previous button is pressed         |
+The same `AsyncDropdownHandlers` interface is used by both
+`registerAsyncDropdown` and [`registerAdvancedTextInput`](#-advanced-text-input-designer-only-async-dropdown).
+
+| Field            | Type                                            | Notes                                                                                  |
+| ---------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `items`          | `Ref<ItemType[]>`                               | Current page of options — `{ value, text }`                                            |
+| `currentPage`    | `Ref<number>`                                   | 1-based current page                                                                   |
+| `totalPages`     | `Ref<number>`                                   | Total page count; set `0` to hide the pager                                            |
+| `handleSearch`   | `(query: string) => void`                       | Called on every keystroke — debounce if needed                                         |
+| `handleNextPage` | `() => void`                                    | Called when the next button is pressed                                                 |
+| `handlePrevPage` | `() => void`                                    | Called when the previous button is pressed                                             |
+| `onSelect?`      | `(question: Question, item: ItemType) => void`  | **Only invoked by `registerAdvancedTextInput`** — ignored by the runtime dropdown      |
 
 > ⚠️ `items`, `currentPage`, and `totalPages` **must be Vue `Ref`s** —
 > the component reads `.value` and re-renders reactively when you mutate them.
+
+---
+
+## 📝 Advanced Text Input (designer-only async dropdown)
+
+`registerAdvancedTextInput` registers a question that **renders as a
+regular text input at runtime**, but whose **`convertInputType` button
+in the form designer** opens your async dropdown instead of the default
+subtype list. When the designer picks an item, your `onSelect` callback
+runs and can mutate the question — e.g. set `name` and `title` from the
+chosen item.
+
+Use this when you want the form designer to choose from a server-backed
+catalogue (FHIR codes, country lists, glossary terms…) but want
+end-users to type freely into a normal text field.
+
+### 1. Register the type
+
+Same `AsyncDropdownHandlers` shape as `registerAsyncDropdown`, plus the
+optional `onSelect`. Must be called from a component's `setup()`.
+
+```vue
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import {
+  FormBuilder,
+  registerAdvancedTextInput,
+  type AsyncDropdownHandlers,
+  type ItemType,
+} from "@yonus_amire01/form-builder";
+
+const COUNTRIES: ItemType[] = [
+  { value: "IR", text: "Iran" },
+  { value: "US", text: "United States" },
+  { value: "GB", text: "United Kingdom" },
+  // …
+];
+
+const PAGE_SIZE = 5;
+const query = ref("");
+const currentPage = ref(1);
+
+const filtered = computed(() => {
+  const q = query.value.toLowerCase().trim();
+  return q
+    ? COUNTRIES.filter((c) => c.text.toLowerCase().includes(q))
+    : COUNTRIES;
+});
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(filtered.value.length / PAGE_SIZE)),
+);
+const items = computed(() =>
+  filtered.value.slice(
+    (currentPage.value - 1) * PAGE_SIZE,
+    currentPage.value * PAGE_SIZE,
+  ),
+);
+
+const handlers: AsyncDropdownHandlers = {
+  items,
+  currentPage,
+  totalPages,
+  handleSearch: (q) => {
+    query.value = q;
+    currentPage.value = 1;
+  },
+  handleNextPage: () => {
+    if (currentPage.value < totalPages.value) currentPage.value++;
+  },
+  handlePrevPage: () => {
+    if (currentPage.value > 1) currentPage.value--;
+  },
+  // designer-only — runs when an item is picked from the convertInputType popup
+  onSelect: (question, item) => {
+    question.name = item.value;
+    question.title = item.text;
+  },
+};
+
+registerAdvancedTextInput("countryAsync", handlers);
+</script>
+
+<template>
+  <FormBuilder />
+</template>
+```
+
+### 2. Use the type in survey JSON
+
+```json
+{
+  "elements": [
+    { "type": "countryAsync", "name": "country" }
+  ]
+}
+```
+
+In the designer, click the question's **convertInputType** button (the
+chevron next to the type label) — your async list pops up. Pick an
+item, and:
+
+- the question's properties update via your `onSelect`,
+- the popup closes,
+- the selection is highlighted on next open, and
+- the action button's title becomes the selected item's `text`.
+
+At runtime the question is a plain text input — the popup never appears.
+
+### How it differs from `registerAsyncDropdown`
+
+| Aspect                   | `registerAsyncDropdown`                    | `registerAdvancedTextInput`                              |
+| ------------------------ | ------------------------------------------ | -------------------------------------------------------- |
+| Runtime render           | Custom dropdown Vue component              | Native text input (`survey-text`)                        |
+| Where the user picks     | At survey-fill time                        | In the designer's `convertInputType` popup               |
+| What selection does      | Sets `question.value = item.value`         | Calls `handlers.onSelect(question, item)` — you decide   |
+| `onSelect` handler       | Ignored                                    | Required for anything to happen                          |
+
+### Internals (for the curious)
+
+- The popup component (`advanced-text-input-popup`) is registered
+  globally on the active Vue app on first call.
+- `QuestionAdornerViewModel.prototype.createConvertInputType` is
+  monkey-patched **once** to swap in the async popup for questions
+  registered through this helper. Other question types keep their
+  default behaviour.
+- The registered class extends `QuestionTextModel` and overrides
+  `getType()` (so the JSON round-trips with your custom type),
+  `getTemplate()` / `getCssType()` → `"text"` (so SurveyJS renders +
+  styles it as a regular text input).
